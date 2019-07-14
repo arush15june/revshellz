@@ -17,12 +17,19 @@ func main() {
 
 	for {
 		chans := chanstore.GetChans()
-
 		for k, v := range chans {
-			fmt.Printf("Writing to %v\r\n", k)
-			v.Channel <- fmt.Sprintf("Test Message to %v\r\n", v)
+
+			// Channel writer.
+			go chanstore.writeChannel(v.WChannel, []byte(fmt.Sprintf("Test Message to %v %d\r\n", v, uint64(time.Now().Unix()))))
+			fmt.Printf("main: writing to %v\r\n", k)
+
+			// Channel reader.
+			msg, err := chanstore.readChannel(v.RChannel)
+			if err == nil {
+				fmt.Println("main:", string(msg))
+			}
 		}
-		time.Sleep(500 * time.Millisecond)
+		time.Sleep(1000 * time.Millisecond)
 	}
 
 }
