@@ -1,5 +1,8 @@
 package main
 
+// TODO: Implement REST API.
+// TODO: Implement WebSocket API.
+
 import (
 	"fmt"
 	"time"
@@ -20,11 +23,11 @@ func main() {
 		for k, v := range chans {
 
 			// Channel writer.
-			go chanstore.writeChannel(v.WChannel, []byte(fmt.Sprintf("Test Message to %v %d\r\n", v, uint64(time.Now().Unix()))))
+			go chanstore.WriteChannel(v.WChannel, []byte(fmt.Sprintf("Test Message to %v %d\r\n", v, uint64(time.Now().Unix()))))
 			fmt.Printf("main: writing to %v\r\n", k)
 
 			// Channel reader.
-			msg, err := chanstore.readChannel(v.RChannel)
+			msg, err := chanstore.ReadChannel(v.RChannel)
 			if err == nil {
 				fmt.Println("main:", string(msg))
 			}
