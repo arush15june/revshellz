@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"time"
 
+	api "./api"
 	chanstore "./pkg/chanstore"
 	socks "./pkg/socks"
 )
@@ -16,15 +17,16 @@ func main() {
 		chanstore.InitStore()
 	}
 
-	go socks.TCPListener("18000")
+	socks.InitTCPListener("18000")
+	api.InitRestApi("5000")
 
 	for {
 		chans := chanstore.GetChans()
-		for k, v := range chans {
+		for _, v := range chans {
 
 			// Channel writer.
-			go chanstore.WriteChannel(v.WChannel, []byte(fmt.Sprintf("Test Message to %v %d\r\n", v, uint64(time.Now().Unix()))))
-			fmt.Printf("main: writing to %v\r\n", k)
+			// go chanstore.WriteChannel(v.WChannel, []byte(fmt.Sprintf("Test Message to %v %d\r\n", v, uint64(time.Now().Unix()))))
+			// fmt.Printf("main: writing to %v\r\n", k)
 
 			// Channel reader.
 			msg, err := chanstore.ReadChannel(v.RChannel)

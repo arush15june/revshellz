@@ -36,6 +36,11 @@ func TCPListener(port string) {
 
 }
 
+// InitTCPListener runs a TCP Listener goroutine on `port`
+func InitTCPListener(port string) {
+	go TCPListener(port)
+}
+
 // connectionHandler handles connections and RW channels of the socket.
 func connectionHandler(writechan chan []byte, readchan chan []byte, conn net.Conn) error {
 	defer func() {
