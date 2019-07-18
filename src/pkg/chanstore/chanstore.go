@@ -9,11 +9,11 @@ import (
 	"sync"
 )
 
-var mutex = &sync.RWMutex{}
-
 // Messenger stores channels of connections and possibly metadata.
 type Messenger struct {
+	RChLock  *sync.Mutex
 	RChannel chan []byte
+	WChLock  *sync.Mutex
 	WChannel chan []byte
 	IPAddr   string
 }
@@ -22,13 +22,44 @@ func (m *Messenger) String() string {
 	return fmt.Sprintf("%v", m.IPAddr)
 }
 
+// WriteChannel writes data to the write channel.
+func (m *Messenger) WriteChannel(data []byte) {
+	m.WChLock.Lock()
+	select {
+	case m.WChannel <- data:
+	}
+	m.WChLock.Unlock()
+}
+
+// ReadChannel reads data, if available, from the messengers Read channel.
+func (m *Messenger) ReadChannel() ([]byte, error) {
+	var readMsg []byte
+	var err error
+	m.RChLock.Lock()
+	select {
+	case readMsg = <-m.RChannel:
+		err = nil
+	default:
+		err = errors.New("nothing to read.")
+	}
+	m.RChLock.Unlock()
+
+	return readMsg, err
+}
+
+// ChannelBroker fans out data from a single channel to multiple allocated channel.
+type MessengerBroker struct {
+	RChannels map[*Messenger][]chan []byte
+	WChannels map[*Messenger][]chan []byte
+}
+
 // createMessenger creates new messenger.
 func createMessenger() *Messenger {
-	newRChannel := make(chan []byte)
-	newWChannel := make(chan []byte)
 	newMessenger := new(Messenger)
-	newMessenger.RChannel = newRChannel
-	newMessenger.WChannel = newWChannel
+	newMessenger.RChannel = make(chan []byte)
+	newMessenger.WChannel = make(chan []byte)
+	newMessenger.RChLock = new(sync.Mutex)
+	newMessenger.WChLock = new(sync.Mutex)
 
 	return newMessenger
 }
@@ -36,6 +67,7 @@ func createMessenger() *Messenger {
 // Store for channel mappings.
 type Store struct {
 	Chans map[string]*Messenger
+	mutex *sync.RWMutex
 }
 
 var storeInitialized bool
@@ -44,34 +76,34 @@ var channelStore *Store
 // InitStore allocates memory to the global channel store.
 func InitStore() {
 	// Non Critical Section.
-	messengerMap := make(map[string]*Messenger)
 	channelStore = new(Store)
-	channelStore.Chans = messengerMap
+	channelStore.Chans = make(map[string]*Messenger)
+	channelStore.mutex = new(sync.RWMutex)
 
 	// Critical Section: accesing storeInitialized.
-	mutex.Lock()
+	channelStore.mutex.Lock()
 	storeInitialized = true
-	mutex.Unlock()
+	channelStore.mutex.Unlock()
 }
 
 // IsStoreInitialized checks if the store is initialized.
 func IsStoreInitialized() bool {
 	// Critical Section: accessing storeInitialized.
-	mutex.RLock()
+	channelStore.mutex.RLock()
 	initialized := storeInitialized
-	mutex.RUnlock()
+	channelStore.mutex.RUnlock()
 
 	return initialized
 }
 
 // GetStore returns the store instance.
 func GetStore() *Store {
-	// IsStoreInitialized locks the mutex.
+	// IsStoreInitialized requires unlocked mutex.
 	if IsStoreInitialized() {
 		// Critical Section: accessing channelStore
-		mutex.RLock()
+		channelStore.mutex.RLock()
 		chanstore := channelStore
-		mutex.RUnlock()
+		channelStore.mutex.RUnlock()
 		return chanstore
 	}
 	return nil
@@ -80,9 +112,9 @@ func GetStore() *Store {
 // GetChans returns the list of channels.
 func GetChans() map[string]*Messenger {
 	// Critical Section: accessing channelStore.
-	mutex.RLock()
+	channelStore.mutex.RLock()
 	chans := channelStore.Chans
-	mutex.RUnlock()
+	channelStore.mutex.RUnlock()
 	return chans
 }
 
@@ -92,9 +124,9 @@ func AddChannel(IPAddr string) *Messenger {
 	newMessenger.IPAddr = IPAddr
 
 	// Critical Section: accessing channelStore.
-	mutex.RLock()
+	channelStore.mutex.RLock()
 	channelStore.Chans[IPAddr] = newMessenger
-	mutex.RUnlock()
+	channelStore.mutex.RUnlock()
 
 	return newMessenger
 }
@@ -102,39 +134,18 @@ func AddChannel(IPAddr string) *Messenger {
 // RemoveChannel removes a mapping of an IPAddress to a channel
 func RemoveChannel(IPAddr string) {
 	// Critical Section: Accessing channelStore
-	mutex.Lock()
+	channelStore.mutex.Lock()
 	channelStore.Chans[IPAddr] = nil
 	delete(channelStore.Chans, IPAddr)
-	mutex.Unlock()
+	channelStore.mutex.Unlock()
 }
 
 // GetChannel retrieves a specfic channel from the channelStore.
 func GetChannel(IPAddr string) *Messenger {
 	// Critical Section: accessing channelStore.
-	mutex.RLock()
+	channelStore.mutex.RLock()
 	selectedMessenger := channelStore.Chans[IPAddr]
-	mutex.RUnlock()
+	channelStore.mutex.RUnlock()
 
 	return selectedMessenger
-}
-
-// WriteChannel writes a byte string to a []byte channel.
-func WriteChannel(ch chan []byte, data []byte) {
-	select {
-	case ch <- data:
-	}
-}
-
-// ReadChannel reads []byte's from a []byte channel.
-func ReadChannel(ch chan []byte) ([]byte, error) {
-	var readMsg []byte
-	var err error
-	select {
-	case readMsg = <-ch:
-		err = nil
-	default:
-		err = errors.New("nothing to read.")
-	}
-
-	return readMsg, err
 }
