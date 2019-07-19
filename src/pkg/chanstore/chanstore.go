@@ -67,9 +67,10 @@ func createMessenger() *Messenger {
 // Store for channel mappings.
 type Store struct {
 	Chans map[string]*Messenger
-	mutex *sync.RWMutex
+	mutex *sync.RWMutex // Mutex for Chans.
 }
 
+var globalMutex sync.Mutex
 var storeInitialized bool
 var channelStore *Store
 
@@ -82,18 +83,17 @@ func InitStore() {
 
 	// Critical Section: accesing storeInitialized.
 	channelStore.mutex.Lock()
+	defer channelStore.mutex.Unlock()
+
 	storeInitialized = true
-	channelStore.mutex.Unlock()
 }
 
 // IsStoreInitialized checks if the store is initialized.
 func IsStoreInitialized() bool {
-	// Critical Section: accessing storeInitialized.
-	channelStore.mutex.RLock()
-	initialized := storeInitialized
-	channelStore.mutex.RUnlock()
-
-	return initialized
+	globalMutex.Lock()
+	defer globalMutex.Unlock()
+	
+	return storeInitialized
 }
 
 // GetStore returns the store instance.
@@ -104,8 +104,10 @@ func GetStore() *Store {
 		channelStore.mutex.RLock()
 		chanstore := channelStore
 		channelStore.mutex.RUnlock()
+		
 		return chanstore
 	}
+	
 	return nil
 }
 
@@ -115,6 +117,7 @@ func GetChans() map[string]*Messenger {
 	channelStore.mutex.RLock()
 	chans := channelStore.Chans
 	channelStore.mutex.RUnlock()
+	
 	return chans
 }
 
@@ -135,9 +138,10 @@ func AddChannel(IPAddr string) *Messenger {
 func RemoveChannel(IPAddr string) {
 	// Critical Section: Accessing channelStore
 	channelStore.mutex.Lock()
+	defer channelStore.mutex.Unlock()
+
 	channelStore.Chans[IPAddr] = nil
 	delete(channelStore.Chans, IPAddr)
-	channelStore.mutex.Unlock()
 }
 
 // GetChannel retrieves a specfic channel from the channelStore.
