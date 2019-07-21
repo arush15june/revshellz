@@ -4,44 +4,59 @@ package main
 // TODO: Implement WebSocket API.
 
 import (
-	"fmt"
-	"time"
-
 	api "./api"
+	flags "./flags"
+	handlers "./handlers"
 	chanstore "./pkg/chanstore"
 	socks "./pkg/socks"
+	tui "./tui"
 )
 
 func main() {
+	flags.InitFlags()
 	if !chanstore.IsStoreInitialized() {
 		chanstore.InitStore()
 	}
 
-	socks.InitTCPListener("18000")
-	api.InitRestApi("5000")
+	var handlerInterface handlers.ConnHandler
 
-	go func() {
-		for {
-			chans := chanstore.GetChans()
-			for _, v := range chans {
-				// Channel reader.
-				msg, err := v.ReadChannel()
-				if err == nil {
-					fmt.Println(v, ":", string(msg))
-				}
-			}
-		}
-	}()
-
-	for {
-		chans := chanstore.GetChans()
-		for k, v := range chans {
-
-			// Channel writer.
-			go v.WriteChannel([]byte(fmt.Sprintf("Test Message to %v %d\r\n", v, uint64(time.Now().Unix()))))
-			fmt.Printf("main: writing to %v\r\n", k)
-		}
-		time.Sleep(500 * time.Millisecond)
+	if *flags.RestApi && !*flags.Tui {
+		handlerInterface = handlers.RestApiHandler{}
+	} else {
+		handlerInterface = handlers.TuiHandler{}
 	}
+
+	socks.InitTCPListener("18000", handlerInterface)
+
+	if *flags.RestApi {
+		api.InitRestApi("5000")
+	} else if *flags.Tui {
+		tui.InitTUI()
+	}
+
+	// go func() {
+	// 	for {
+	// 		chans := chanstore.GetChans()
+	// 		for _, v := range chans {
+	// 			// Channel reader.
+	// 			msg, err := v.ReadChannel()
+	// 			if err == nil {
+	// 				tui.WriteLogView(fmt.Sprintln(v, ":", string(msg)))
+	// 			}
+	// 		}
+	// 	}
+	// }()
+
+	// for {
+	// 	chans := chanstore.GetChans()
+	// 	for _, v := range chans {
+
+	// 		// Channel writer.
+	// 		// go handlerInterface.HandleWriteMessage(v.IPAddr, []byte(fmt.Sprintf("Test Message to %v %d\r\n", v, uint64(time.Now().Unix()))))
+	// 		go handlerInterface.HandleWriteMessage(v.IPAddr, []byte("dir"))
+	// 		// fmt.Printf("main: writing to %v\r\n", k)
+	// 	}
+	// 	time.Sleep(500 * time.Millisecond)
+	// }
 
 }

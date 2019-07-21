@@ -92,7 +92,7 @@ func InitStore() {
 func IsStoreInitialized() bool {
 	globalMutex.Lock()
 	defer globalMutex.Unlock()
-	
+
 	return storeInitialized
 }
 
@@ -104,10 +104,10 @@ func GetStore() *Store {
 		channelStore.mutex.RLock()
 		chanstore := channelStore
 		channelStore.mutex.RUnlock()
-		
+
 		return chanstore
 	}
-	
+
 	return nil
 }
 
@@ -117,7 +117,7 @@ func GetChans() map[string]*Messenger {
 	channelStore.mutex.RLock()
 	chans := channelStore.Chans
 	channelStore.mutex.RUnlock()
-	
+
 	return chans
 }
 
