@@ -7,7 +7,7 @@
 - TODO: Informational REST API.
 - TODO: Web Socket based real time frontend.
 
-![Terminal UI][screenshot.jpg]
+![Terminal UI](screenshot.jpg)
 
 ## Architecture
 
