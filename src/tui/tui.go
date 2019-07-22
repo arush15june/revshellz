@@ -3,6 +3,9 @@ package tui
 // Terminal UI
 
 import (
+	"fmt"
+
+	flags "../flags"
 	"github.com/rivo/tview"
 )
 
@@ -32,6 +35,7 @@ func InitTUI() {
 		AddItem(BottomFlex, 7, 1, false)
 
 	Handlers()
+	WriteTextView(LogView, fmt.Sprintf("[+] Started listener on :%v\n", *flags.Port))
 	if err := app.SetRoot(RootFlex, true).SetFocus(LogView).Run(); err != nil {
 		panic(err)
 	}

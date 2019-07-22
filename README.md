@@ -27,6 +27,7 @@
 
 ## TODO
 
-- Terminal UI using tview.
+- Better Logging.
+- Simple stdout message handlers.
 - REST API: connection information.
 - WebSockets: real time shell interaction.

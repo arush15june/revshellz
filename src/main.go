@@ -26,7 +26,7 @@ func main() {
 		handlerInterface = handlers.TuiHandler{}
 	}
 
-	socks.InitTCPListener("18000", handlerInterface)
+	socks.InitTCPListener(*flags.Port, handlerInterface)
 
 	if *flags.RestApi {
 		api.InitRestApi("5000")
