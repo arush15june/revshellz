@@ -3,7 +3,7 @@
 ## Features
 
 - Interact with multiple TCP connections concurrently.
-- TODO: Terminal based UI.
+- Terminal based UI.
 - TODO: Informational REST API.
 - TODO: Web Socket based real time frontend.
 
@@ -18,7 +18,7 @@
 
 ```bash
     cd src
-    go run main.go
+    go run main.go 
 ```
 
 - Opens a listener on port 18000.
