@@ -13,6 +13,9 @@ var (
 	// ConnViews map the IP Addresses to the connection TextViews.
 	ConnViews map[string]*tview.TextView
 	mutex     sync.Mutex
+
+	// CurrentFocusedView points to the current focused primitive.
+	CurrentFocusedView tview.Primitive
 )
 
 // NewTitledBox returns a titled Box.
@@ -33,6 +36,41 @@ func NewTextView(title string) *tview.TextView {
 
 	return textView
 }
+
+// Handle input to ShellView.
+// func ShellViewEventHandler(evt *tcell.EventKey) *tcell.EventKey {
+// 	key := evt.Key()
+// 	switch key {
+// 	case tcell.KeyRune:
+// 		{
+// 			WriteTextView(CurrentFocusedView.(*tview.TextView), string(evt.Rune()))
+// 		}
+// 	case tcell.KeyEscape:
+// 		{
+// 			app.SetFocus(RootFlex)
+// 		}
+// 	}
+
+// 	return evt
+// }
+
+// RootFlexHandler handles input for the RootFlex.
+// func RootFlexHandler(evt *tcell.EventKey) *tcell.EventKey {
+// 	key := evt.Key()
+// 	nShells := len(ConnViews)
+
+// 	switch key {
+// 	case tcell.KeyRune:
+// 		if strconv.ParseUint(event.Rune()) <= nShells && strconv.ParseUint(event.Rune()) > 0:
+// 			CurrentFocusedView = ConnViews[]
+// 	case tcell.KeyEscape:
+// 		{
+// 			app.SetFocus(RootFlex)
+// 		}
+// 	}
+
+// 	return evt
+// }
 
 // NewShellView creates a new box for a connection.
 func NewShellView(title string) *tview.TextView {
@@ -60,6 +98,7 @@ func RemoveViewFromMap(ip string) {
 	})
 }
 
+// GetViewFromIp returns the view from the ConnViews map.
 func GetViewFromIp(ip string) *tview.TextView {
 	mutex.Lock()
 	defer mutex.Unlock()
@@ -71,10 +110,13 @@ func AddConnection(ip string) *tview.TextView {
 	WriteLogView(fmt.Sprintf("[*] Connection from! %s\n", ip))
 
 	ShellView := NewShellView(fmt.Sprintf("[red]%v", ip))
+	// ShellView.SetInputCapture(ShellViewEventHandler)
 	AddViewToMap(ShellView, ip)
 
 	app.QueueUpdateDraw(func() {
 		TopFlex.AddItem(ShellView, 0, 1, false)
+		// app.SetFocus(ShellView)
+		CurrentFocusedView = ShellView
 	})
 
 	return ShellView

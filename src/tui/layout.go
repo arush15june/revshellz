@@ -18,13 +18,8 @@ var (
 
 // InitTopFlex initializes the top flex bar.
 func InitTopFlex() {
-	// Shell1Box := NewTextView("Shell 1")
-	// Shell2Box := NewTextView("Shell 2")
-
 	TopFlex = tview.NewFlex().SetDirection(tview.FlexRow)
 	TopFlex.SetBorder(true)
-	// TopFlex.AddItem(Shell1Box, 0, 1, false).
-	// AddItem(Shell2Box, 0, 1, false)
 }
 
 // InitBottomFlex initialzes the bottom flex bar.
@@ -40,8 +35,6 @@ func InitBottomFlex() {
 // Handlers initializes the ViewHandler.
 func Handlers() {
 	go connectionBoxHandler()
-	go logViewHandler()
-	go topFlexHandler()
 }
 
 func connectionBoxHandler() {
@@ -68,12 +61,4 @@ func connectionBoxHandler() {
 		nchans = len(chans)
 		clear = false
 	}
-}
-
-func logViewHandler() {
-
-}
-
-func topFlexHandler() {
-
 }

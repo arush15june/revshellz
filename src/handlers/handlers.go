@@ -11,7 +11,7 @@ import (
 // - New Connections
 // - Close Connection
 // - When a message is received.
-// -
+// - When a message is to be written.
 type ConnHandler interface {
 	HandleNewConnection(ip string)
 	HandleCloseConnection(ip string)

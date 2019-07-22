@@ -4,8 +4,6 @@ package tui
 
 import (
 	"github.com/rivo/tview"
-
-	handlers "../handlers"
 )
 
 var (
@@ -20,9 +18,6 @@ var (
 
 	// TopFlex is the the top bar flex manger.
 	TopFlex *tview.Flex
-
-	// Handler is the connection handler interface for the TUI.
-	Handler handlers.TuiHandler
 )
 
 // InitTUI sets up the terminal based UI for the application.

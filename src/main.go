@@ -33,30 +33,4 @@ func main() {
 	} else if *flags.Tui {
 		tui.InitTUI()
 	}
-
-	// go func() {
-	// 	for {
-	// 		chans := chanstore.GetChans()
-	// 		for _, v := range chans {
-	// 			// Channel reader.
-	// 			msg, err := v.ReadChannel()
-	// 			if err == nil {
-	// 				tui.WriteLogView(fmt.Sprintln(v, ":", string(msg)))
-	// 			}
-	// 		}
-	// 	}
-	// }()
-
-	// for {
-	// 	chans := chanstore.GetChans()
-	// 	for _, v := range chans {
-
-	// 		// Channel writer.
-	// 		// go handlerInterface.HandleWriteMessage(v.IPAddr, []byte(fmt.Sprintf("Test Message to %v %d\r\n", v, uint64(time.Now().Unix()))))
-	// 		go handlerInterface.HandleWriteMessage(v.IPAddr, []byte("dir"))
-	// 		// fmt.Printf("main: writing to %v\r\n", k)
-	// 	}
-	// 	time.Sleep(500 * time.Millisecond)
-	// }
-
 }
