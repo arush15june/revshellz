@@ -38,6 +38,7 @@ func (t TuiHandler) HandleCloseConnection(ip string) {
 func (t TuiHandler) HandleReadMessage(ip string, data []byte) {
 	view := tui.GetViewFromIp(ip)
 	tui.WriteTextView(view, fmt.Sprintf("[green]>> [white]%v\n", string(data)))
+	view.ScrollToEnd()
 }
 
 func (t TuiHandler) HandleWriteMessage(ip string, data []byte) {
