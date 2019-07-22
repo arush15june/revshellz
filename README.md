@@ -20,7 +20,12 @@
 
 ```bash
     cd src
+<<<<<<< HEAD
     go run main.go ```
+=======
+    go run main.go 
+```
+>>>>>>> 419d36f3111cc97c23ce332c74381eac210f688e
 
 - Opens a listener on port 18000.
 - Test it with `nc 127.0.0.1 18000`.
