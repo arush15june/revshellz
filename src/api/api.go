@@ -9,7 +9,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 
-	rest "./rest"
+	rest "github.com/arush15june/revshellz/src/api/rest"
 )
 
 var r *chi.Mux

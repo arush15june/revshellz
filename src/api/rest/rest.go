@@ -5,8 +5,8 @@ package rest
 import (
 	"net/http"
 
-	chanstore "../../pkg/chanstore"
-	utils "../../pkg/utils"
+	chanstore "github.com/arush15june/revshellz/src/pkg/chanstore"
+	utils "github.com/arush15june/revshellz/src/pkg/utils"
 )
 
 type GetChansResourcePayload struct {

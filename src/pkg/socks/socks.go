@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"net"
 
-	handlers "../../handlers"
-	chanstore "../chanstore"
+	handlers "github.com/arush15june/revshellz/src/handlers"
+	chanstore "github.com/arush15june/revshellz/src/pkg/chanstore"
 )
 
 var (

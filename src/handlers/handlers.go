@@ -3,8 +3,8 @@ package handlers
 import (
 	"fmt"
 
-	chanstore "../pkg/chanstore"
-	tui "../tui"
+	chanstore "github.com/arush15june/revshellz/src/pkg/chanstore"
+	tui "github.com/arush15june/revshellz/src/tui"
 )
 
 // ConnHandler is the interface to handling information for connections.
@@ -66,17 +66,20 @@ func (r RestApiHandler) HandleWriteMessage(ip string, data []byte) {
 }
 
 func (l LineHandler) HandleNewConnection(ip string) {
-
+	fmt.Printf("[+] New Connection: %v\n", ip)
 }
 
 func (l LineHandler) HandleCloseConnection(ip string) {
-
+	fmt.Printf("[-] Closed Connection %v\n", ip)
 }
 
 func (l LineHandler) HandleReadMessage(ip string, data []byte) {
-
+	fmt.Printf("[%v] %v\n", ip, string(data))
 }
 
 func (l LineHandler) HandleWriteMessage(ip string, data []byte) {
+	channel := chanstore.GetChannel(ip)
+	channel.WriteChannel(data)
 
+	fmt.Printf(">>[%v] %v\n", ip, string(data))
 }

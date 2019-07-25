@@ -4,12 +4,14 @@ package main
 // TODO: Implement WebSocket API.
 
 import (
-	api "./api"
-	flags "./flags"
-	handlers "./handlers"
-	chanstore "./pkg/chanstore"
-	socks "./pkg/socks"
-	tui "./tui"
+	"fmt"
+	
+	api "github.com/arush15june/revshellz/src/api"
+	flags "github.com/arush15june/revshellz/src/flags"
+	handlers "github.com/arush15june/revshellz/src/handlers"
+	chanstore "github.com/arush15june/revshellz/src/pkg/chanstore"
+	socks "github.com/arush15june/revshellz/src/pkg/socks"
+	tui "github.com/arush15june/revshellz/src/tui"
 )
 
 func main() {
@@ -20,9 +22,11 @@ func main() {
 
 	var handlerInterface handlers.ConnHandler
 
-	if *flags.RestApi && !*flags.Tui {
+	if *flags.RestApi {
 		handlerInterface = handlers.RestApiHandler{}
-	} else {
+	} else if *flags.Line {
+		handlerInterface = handlers.LineHandler{}
+	} else if *flags.Tui {
 		handlerInterface = handlers.TuiHandler{}
 	}
 
@@ -32,5 +36,10 @@ func main() {
 		api.InitRestApi("5000")
 	} else if *flags.Tui {
 		tui.InitTUI()
+	} else if *flags.Line {
+		fmt.Printf("Listening on :%v\n", *flags.Port)
+		for {
+			
+		}
 	}
 }

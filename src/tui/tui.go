@@ -5,7 +5,7 @@ package tui
 import (
 	"fmt"
 
-	flags "../flags"
+	flags "github.com/arush15june/revshellz/src/flags"
 	"github.com/rivo/tview"
 )
 

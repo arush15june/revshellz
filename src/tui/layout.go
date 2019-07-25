@@ -4,7 +4,7 @@ package tui
 import (
 	"fmt"
 
-	chanstore "../pkg/chanstore"
+	chanstore "github.com/arush15june/revshellz/src/pkg/chanstore"
 	"github.com/rivo/tview"
 )
 
