@@ -4,6 +4,7 @@
 
 - Interact with multiple TCP connections concurrently.
 - Terminal based UI.
+- Simple stdout message handlers.
 - TODO: Informational REST API.
 - TODO: Web Socket based real time frontend.
 
@@ -29,6 +30,5 @@
 ## TODO
 
 - Better Logging.
-- Simple stdout message handlers.
 - REST API: connection information.
 - WebSockets: real time shell interaction.
