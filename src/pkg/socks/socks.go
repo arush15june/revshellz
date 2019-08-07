@@ -61,28 +61,20 @@ func connectionHandler(writechan chan []byte, readchan chan []byte, conn net.Con
 
 	w := bufio.NewWriter(conn)
 
-	var status bool
 	connStatus := make(chan bool)
 
 	go readHandler(readchan, connStatus, scanner, conn)
 
 	for {
-		// Verify TCP Connection Status.
-		status = true
-		select {
-		case status = <-connStatus:
-		default:
-		}
-
-		if !status {
-			break
-		}
-
 		select {
 		case msg := <-writechan:
 			w.Write(msg)
 			w.Flush()
-		default:
+		// Verify TCP Connection Status.
+		case status := <-connStatus:
+			if !status {
+				break
+			}
 		}
 	}
 
@@ -102,17 +94,7 @@ func readHandler(readchan chan []byte, status chan bool, scanner *bufio.Scanner,
 
 		msg := scanner.Bytes()
 		handler.HandleReadMessage(conn.RemoteAddr().String(), msg)
-
-		// if *flags.Tui && !*flags.RestApi {
-		// 	tui.WriteTextView(view, fmt.Sprintf("[green]$ [white]%v\n", string(msg)))
-		// } else if *flags.RestApi {
-		// 	select {
-		// 	case readchan <- msg:
-		// 	}
-		// }
 	}
-
-	return
 }
 
 func scanAndVerifyConnection(scanner *bufio.Scanner) bool {
